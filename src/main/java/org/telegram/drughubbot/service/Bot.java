@@ -133,18 +133,31 @@ public class Bot extends TelegramLongPollingBot {
     private void handlerContact(Message message, DatabaseManager.ModelUser modelUser) {
 
         User user = message.getFrom();
-
         long userId = user.getId();
+        String command = message.hasText() ? message.getText().toLowerCase() : "";
+
+        if (command.equals("стоп")) {
+            registerUserStatus.put(userId, STATUS_NOT_WAITING);
+            return;
+        }
+
         Contact contact = message.getContact();
 
         if (contact != null) {
 
             modelUser.setPhone(contact.getPhoneNumber());
+            modelUser.setIsDealer(1);
             registerUsers.put(userId, modelUser);
             database.saveUser(modelUser);
 
             sendMsg(message, "Спасибо, я обновил твои контакты");
             registerUserStatus.put(userId, STATUS_NOT_WAITING);
+
+            Help help = new Help(modelUser);
+            sendKeyboard(message, help.getKeyboard(), "Тебе доступны новые команды");
+
+        } else {
+            sendMsg(message, "Изпользуй 'contact', если передумал напиши 'стоп'");
         }
     }
 
@@ -154,6 +167,7 @@ public class Bot extends TelegramLongPollingBot {
 
         String command = message.getText().toLowerCase();
         Command commandClass;
+        Help help = new Help(modelUser);
 
         switch (command) {
             case "/start":
@@ -165,9 +179,9 @@ public class Bot extends TelegramLongPollingBot {
                 break;
 
             case "/help":
+            case "help":
             case "помощь":
-                commandClass = new Help(modelUser);
-                sendMsg(message, commandClass.answer());
+                sendMsg(message, help.answer());
                 break;
 
             case "/top":
@@ -178,17 +192,50 @@ public class Bot extends TelegramLongPollingBot {
 
             case "/chat":
             case "чат":
+            case "попиздеть":
+            case "попиздеть со мной =)":
+                Boltalka boltalka = new Boltalka();
                 registerUserStatus.put(modelUser.getUserId(), STATUS_BOLTALKA);
-                sendMsg(message, "Останови меня как надоест " + Emoji.CRYING_FACE.toString());
+                sendKeyboard(message, boltalka.getKeyboard(), "Останови меня как надоест " + Emoji.DIZZY_FACE.toString());
                 break;
 
             case "/addme":
             case "зарегистрироваться как продавец":
-                //commandClass = new Dealer();
+
+                if (modelUser.getIsDealer() == 1) {
+                    sendMsg(message, "Ты еже зарегистрирован как продавец и участуешь в рейтинге.");
+                } else {
+                    sendMsg(message, "Хорошо, теперь отправь мне свои контакты.");
+                    registerUserStatus.put(modelUser.getUserId(), STATUS_WAITING_CONTACT);
+                }
+
+                break;
+
+            case "/info":
+            case "информация":
+                sendMsg(message, "У каждого продавца есть свой рейтинг, который строится на основе мнений покупателей. " +
+                        "Если твой рейтинг опустится слишком низко, нам придется заблокировать тебя " +
+                        Emoji.CRYING_FACE.toString() + ". Будьте лояльны к своим покупателям и увеличивайте продажи. Успехов " +
+                        Emoji.CAT_FACE_WITH_WRY_SMILE.toString());
+                break;
+
+
+            case "/orderlist":
+            case "посмотреть доступные заявки":
+
+                break;
+
+            case "/reset":
+            case "я передумал быть пордавцом":
+                modelUser.setIsDealer(0);
+                registerUsers.put(modelUser.getUserId(), modelUser);
+                database.saveUser(modelUser);
+                help = new Help(modelUser);
+                sendKeyboard(message, help.getKeyboard(), "Сказано, сделано...");
                 break;
 
             default:
-                sendMsg(message, "Сорян, я не знаю такой команды");
+                sendKeyboard(message, help.getKeyboard(), "Сорян, я не знаю такой команды");
         }
     }
 

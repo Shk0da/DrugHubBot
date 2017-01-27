@@ -23,6 +23,10 @@ public class Boltalka extends Command {
     private static long START_CACHE = 0;
     private static JSONArray JOKS = null;
 
+    public Boltalka() {
+        buttons.put("/stop", "стоп");
+    }
+
     @Override
     public String answer() {
         return getMessage();

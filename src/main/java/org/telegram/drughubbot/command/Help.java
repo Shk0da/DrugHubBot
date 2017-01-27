@@ -19,6 +19,7 @@ public class Help extends Command {
 
         if (modelUser.getIsDealer() == 1) {
             buttons.put("/orderlist", "посмотреть доступные заявки");
+            buttons.put("/reset", "я передумал быть пордавцом");
             buttons.put("/info", "информация");
         } else {
             buttons.put("/top", "топ продавцов");
