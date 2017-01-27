@@ -9,6 +9,13 @@ public class Help extends Command {
 
     private DatabaseManager.ModelUser modelUser;
 
+    public Help()
+    {
+        buttons.put("/chat", "попиздеть со мной =)");
+        buttons.put("/top", "топ продавцов");
+        buttons.put("/addme", "зарегистрироваться как продавец");
+    }
+
     @Override
     public Map<String, String> getButtons() {
 
@@ -22,8 +29,6 @@ public class Help extends Command {
             buttons.put("/top", "топ продавцов");
             buttons.put("/addme", "зарегистрироваться как продавец");
         }
-
-        buttons.put("/chat", "попиздеть со мной =)");
 
         return buttons;
     }
