@@ -34,6 +34,7 @@ public abstract class Command {
             if (oldObject != null)
                 return oldObject;
         }
+
         return object;
     }
 

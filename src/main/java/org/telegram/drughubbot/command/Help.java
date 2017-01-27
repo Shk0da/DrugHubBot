@@ -26,8 +26,7 @@ public class Help extends Command {
             buttons.put("/reset", "я передумал быть пордавцом");
             buttons.put("/info", "информация");
         } else {
-            buttons.put("/top", "топ продавцов");
-            buttons.put("/addme", "зарегистрироваться как продавец");
+            buttons = this.buttons;
         }
 
         return buttons;
