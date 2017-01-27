@@ -7,17 +7,14 @@ import java.util.Map;
 
 public class Help extends Command {
 
-    public Map<String, String> buttons = new HashMap<>();
+    private DatabaseManager.ModelUser modelUser;
 
-    public Help() {
-        buttons.put("/chat", "попиздеть со мной =)");
-    }
+    @Override
+    public Map<String, String> getButtons() {
 
-    public Help(DatabaseManager.ModelUser modelUser) {
+        Map<String, String> buttons = new HashMap<>();
 
-        this();
-
-        if (modelUser.getIsDealer() == 1) {
+        if (modelUser != null && modelUser.getIsDealer() == 1) {
             buttons.put("/orderlist", "посмотреть доступные заявки");
             buttons.put("/reset", "я передумал быть пордавцом");
             buttons.put("/info", "информация");
@@ -25,11 +22,14 @@ public class Help extends Command {
             buttons.put("/top", "топ продавцов");
             buttons.put("/addme", "зарегистрироваться как продавец");
         }
+
+        buttons.put("/chat", "попиздеть со мной =)");
+
+        return buttons;
     }
 
-    @Override
-    public Map<String, String> getButtons() {
-        return buttons;
+    public void setModelUser(DatabaseManager.ModelUser modelUser) {
+        this.modelUser = modelUser;
     }
 
     @Override

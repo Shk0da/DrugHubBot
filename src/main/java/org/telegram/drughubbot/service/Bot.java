@@ -14,11 +14,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Bot extends TelegramLongPollingBot {
 
-    private static Map<Long, DatabaseManager.ModelUser> registerUsers = new ConcurrentHashMap<>();
+    private static volatile Map<Long, DatabaseManager.ModelUser> registerUsers = new ConcurrentHashMap<>();
     private static final Config appConfig = Config.getInstance();
     private static final DatabaseManager database = DatabaseManager.getInstance();
 
-    private static Map<Long, Integer> registerUserStatus = new ConcurrentHashMap<>();
+    private static volatile Map<Long, Integer> registerUserStatus = new ConcurrentHashMap<>();
     private static final int STATUS_NOT_WAITING = 0;
     private static final int STATUS_WAITING_CONTACT = 1;
     private static final int STATUS_WAITING_LOCATION = 2;
@@ -123,7 +123,7 @@ public class Bot extends TelegramLongPollingBot {
 
             sendMsg(message, "Спасибо, твой город: " + city);
             registerUserStatus.put(userId, STATUS_NOT_WAITING);
-            Command help = new Help(modelUser);
+            Help help = Command.getInstance(Help.class);
             sendKeyboard(message, help.getKeyboard(), Emoji.INFORMATION_SOURCE.toString());
         } else {
             sendMsg(message, "Я не смогу работать, если не буду знать твой город, используй 'location'");
@@ -153,7 +153,7 @@ public class Bot extends TelegramLongPollingBot {
             sendMsg(message, "Спасибо, я обновил твои контакты");
             registerUserStatus.put(userId, STATUS_NOT_WAITING);
 
-            Help help = new Help(modelUser);
+            Help help = Command.getInstance(Help.class);
             sendKeyboard(message, help.getKeyboard(), "Тебе доступны новые команды");
 
         } else {
@@ -167,11 +167,11 @@ public class Bot extends TelegramLongPollingBot {
 
         String command = message.getText().toLowerCase();
         Command commandClass;
-        Help help = new Help(modelUser);
+        Help help = Command.getInstance(Help.class);
 
         switch (command) {
             case "/start":
-                commandClass = new Start();
+                commandClass = Command.getInstance(Start.class);
                 sendMsg(message, "Привет, " + modelUser.getName() + "!");
                 sendMsg(message, commandClass.answer());
                 sendMsg(message, commandClass.getMessage());
@@ -181,12 +181,13 @@ public class Bot extends TelegramLongPollingBot {
             case "/help":
             case "help":
             case "помощь":
+                help.setModelUser(modelUser);
                 sendMsg(message, help.answer());
                 break;
 
             case "/top":
             case "топ продавцов":
-                commandClass = new Top();
+                commandClass = Command.getInstance(Top.class);
                 sendKeyboard(message, commandClass.getKeyboard(), Emoji.CHART.toString());
                 break;
 
@@ -194,9 +195,9 @@ public class Bot extends TelegramLongPollingBot {
             case "чат":
             case "попиздеть":
             case "попиздеть со мной =)":
-                Boltalka boltalka = new Boltalka();
+                commandClass = Command.getInstance(Boltalka.class);
                 registerUserStatus.put(modelUser.getUserId(), STATUS_BOLTALKA);
-                sendKeyboard(message, boltalka.getKeyboard(), "Останови меня как надоест " + Emoji.DIZZY_FACE.toString());
+                sendKeyboard(message, commandClass.getKeyboard(), "Останови меня как надоест " + Emoji.DIZZY_FACE.toString());
                 break;
 
             case "/addme":
@@ -230,11 +231,12 @@ public class Bot extends TelegramLongPollingBot {
                 modelUser.setIsDealer(0);
                 registerUsers.put(modelUser.getUserId(), modelUser);
                 database.saveUser(modelUser);
-                help = new Help(modelUser);
+                help.setModelUser(modelUser);
                 sendKeyboard(message, help.getKeyboard(), "Сказано, сделано...");
                 break;
 
             default:
+                help.setModelUser(modelUser);
                 sendKeyboard(message, help.getKeyboard(), "Сорян, я не знаю такой команды");
         }
     }

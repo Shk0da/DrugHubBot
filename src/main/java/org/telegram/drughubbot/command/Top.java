@@ -3,13 +3,9 @@ package org.telegram.drughubbot.command;
 import org.telegram.drughubbot.service.Emoji;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboard;
 
-import java.util.HashMap;
 import java.util.Map;
 
-
 public class Top extends Command {
-
-    public Map<String, String> buttons = new HashMap<>();
 
     public Top() {
         buttons.put("/order ОПИСАНИЕ", "оставить заявку");
