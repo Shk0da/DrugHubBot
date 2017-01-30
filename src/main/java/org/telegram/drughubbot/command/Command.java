@@ -21,18 +21,18 @@ public abstract class Command {
     abstract public String getMessage();
 
     @SuppressWarnings("unchecked")
-    public static <T> T getInstance(Class<T> clazz) {
-        T object = (T) mapInstances.get(clazz);
+    public static <Command> Command getInstance(Class<Command> clazz) {
+        Command object = (Command) mapInstances.get(clazz);
         if (object == null) {
             try {
                 object = clazz.newInstance();
-            } catch (IllegalAccessException | InstantiationException
-                    | SecurityException ex) {
+            } catch (IllegalAccessException | InstantiationException | SecurityException ex) {
                 throw new RuntimeException(ex);
             }
-            T oldObject = (T) mapInstances.putIfAbsent(clazz, object);
-            if (oldObject != null)
-                return oldObject;
+
+            Command oldObject = (Command) mapInstances.putIfAbsent(clazz, object);
+
+            if (oldObject != null) return oldObject;
         }
 
         return object;

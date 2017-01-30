@@ -1,6 +1,6 @@
 /target
-TelegramBots0.0.log
-TelegramBots0.0.log.lck
+*.log
+*.log.lck
 .idea
-drughubbot.iml
+*.iml
 /src/main/resources/config.ini

@@ -1,5 +1,6 @@
 package org.telegram.drughubbot.database;
 
+import com.sun.istack.internal.Nullable;
 import org.telegram.telegrambots.logging.BotLogger;
 
 import java.sql.PreparedStatement;
@@ -42,6 +43,7 @@ public class DatabaseManager {
         } else {
             currentInstance = instance;
         }
+
         return currentInstance;
     }
 
@@ -51,7 +53,8 @@ public class DatabaseManager {
         return CreationStrings.version;
     }
 
-    public ModelUser getUser(long userId) {
+    @Nullable
+    public synchronized ModelUser getUser(long userId) {
         ModelUser user = null;
         try {
             final PreparedStatement preparedStatement = connetion.getPreparedStatement("SELECT * FROM users WHERE user_id = ? LIMIT 1");
@@ -76,7 +79,7 @@ public class DatabaseManager {
         return user;
     }
 
-    public void saveUser(ModelUser user) {
+    public synchronized void saveUser(ModelUser user) {
         try {
             final PreparedStatement preparedStatement = connetion.getPreparedStatement("SELECT user_id FROM users WHERE user_id = ? LIMIT 1");
             preparedStatement.setLong(1, user.getUserId());

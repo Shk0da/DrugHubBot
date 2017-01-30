@@ -15,8 +15,7 @@ public class ConectionDB {
         this.currentConection = openConexion();
     }
 
-    public Boolean checkDB()
-    {
+    public Boolean checkDB() {
         return true;
     }
 
@@ -38,7 +37,6 @@ public class ConectionDB {
         } catch (SQLException e) {
             BotLogger.error(LOGTAG, e);
         }
-
     }
 
     public ResultSet runSqlQuery(String query) throws SQLException {

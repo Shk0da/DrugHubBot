@@ -117,7 +117,7 @@ public class Bot extends TelegramLongPollingBot {
             String city = Geo.getCityNameByCoordinate(location.getLatitude(), location.getLongitude());
 
             modelUser.setCity(city);
-            modelUser.setLocation(location.getLatitude() + ", " + location.getLongitude());
+            modelUser.setLocation(location.getLatitude() + "," + location.getLongitude());
             registerUsers.put(userId, modelUser);
             database.saveUser(modelUser);
 
